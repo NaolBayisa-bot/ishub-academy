@@ -1,0 +1,24 @@
+{
+  "name": "ishub-academy",
+  "private": true,
+  "workspaces": [
+    "shared",
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev:backend": "npm -w backend run start:dev",
+    "dev:frontend": "npm -w frontend run dev",
+    "dev": "concurrently -n BE,FE -c blue,green \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "build:shared": "npm -w shared run build",
+    "build": "npm run build:shared && npm -w backend run build && npm -w frontend run build",
+    "db:push": "npm -w backend run prisma:push",
+    "db:migrate": "npm -w backend run prisma:migrate",
+    "db:seed": "npm -w backend run prisma:seed",
+    "db:studio": "npm -w backend run prisma:studio",
+    "setup": "npm install && npm run build:shared && npm run db:push && npm run db:seed"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

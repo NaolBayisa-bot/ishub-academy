@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  CATEGORY_ADMIN
+  MAIN_ADMIN
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  REJECTED
+  SUSPENDED
+}
+
+enum CategoryName {
+  CYBERSECURITY
+  DEVELOPMENT
+  NETWORKING
+  CREATIVE_WORKS
+}
+
+model Category {
+  id                 Int          @id @default(autoincrement())
+  name               CategoryName @unique
+  description        String?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  preferredByStudents User[]      @relation("PreferredCategory")
+  approvedStudents    User[]      @relation("ApprovedCategory")
+
+  @@map("categories")
+}
+
+model User {
+  id                  Int        @id @default(autoincrement())
+  fullName            String
+  email               String     @unique
+  passwordHash        String?
+  googleId            String?    @unique
+  role                Role       @default(STUDENT)
+  status              UserStatus @default(PENDING)
+  department          String
+  academicYear        String
+  preferredCategoryId Int
+  approvedCategoryId  Int?
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  preferredCategory Category  @relation("PreferredCategory", fields: [preferredCategoryId], references: [id])
+  approvedCategory  Category? @relation("ApprovedCategory", fields: [approvedCategoryId], references: [id])
+
+  @@map("users")
+}
