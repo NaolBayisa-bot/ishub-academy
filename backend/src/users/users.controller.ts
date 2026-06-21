@@ -33,4 +33,13 @@ export class UsersController {
   ) {
     return this.usersService.updateStatus(id, dto);
   }
+
+  @Patch(':id/role')
+  @Roles(Role.MAIN_ADMIN)
+  async updateRole(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: { role: Role; approvedCategoryId?: number },
+  ) {
+    return this.usersService.updateRole(id, body);
+  }
 }

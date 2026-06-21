@@ -7,6 +7,104 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Category {
+  id                  Int          @id @default(autoincrement())
+  name                CategoryName @unique
+  description         String?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  trainings           Training[]
+  approvedStudents    User[]       @relation("ApprovedCategory")
+  preferredByStudents User[]       @relation("PreferredCategory")
+
+  @@map("categories")
+}
+
+model User {
+  id                  Int                  @id @default(autoincrement())
+  firstName           String
+  lastName            String
+  email               String               @unique
+  passwordHash        String?
+  googleId            String?              @unique
+  role                Role                 @default(STUDENT)
+  status              UserStatus           @default(PENDING)
+  department          String
+  academicYear        String
+  preferredCategoryId Int
+  approvedCategoryId  Int?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  lessonCompletions   LessonCompletion[]
+  trainings           Training[]
+  approvedCategory    Category?            @relation("ApprovedCategory", fields: [approvedCategoryId], references: [id])
+  preferredCategory   Category             @relation("PreferredCategory", fields: [preferredCategoryId], references: [id])
+
+  @@map("users")
+}
+
+model LessonCompletion {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  lessonId    Int
+  trainingId  Int
+  completedAt DateTime  @default(now())
+  lesson      Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  training    Training  @relation(fields: [trainingId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@unique([userId, lessonId])
+  @@map("lesson_completions")
+}
+
+model Lesson {
+  id                Int                @id @default(autoincrement())
+  title             String
+  content           String
+  imageUrl          String?
+  order             Int                @default(0)
+  moduleId          Int
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime
+  lessonCompletions LessonCompletion[]
+  module            Module             @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@map("lessons")
+}
+
+model Module {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?
+  order       Int       @default(0)
+  trainingId  Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime
+  lessons     Lesson[]
+  training    Training  @relation(fields: [trainingId], references: [id], onDelete: Cascade)
+
+  @@map("modules")
+}
+
+model Training {
+  id                Int                @id @default(autoincrement())
+  title             String
+  description       String
+  thumbnail         String?
+  difficulty        Difficulty         @default(BEGINNER)
+  status            TrainingStatus     @default(DRAFT)
+  categoryId        Int
+  createdById       Int
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime
+  lessonCompletions LessonCompletion[]
+  modules           Module[]
+  category          Category           @relation(fields: [categoryId], references: [id])
+  createdBy         User               @relation(fields: [createdById], references: [id])
+
+  @@map("trainings")
+}
+
 enum Role {
   STUDENT
   CATEGORY_ADMIN
@@ -27,35 +125,14 @@ enum CategoryName {
   CREATIVE_WORKS
 }
 
-model Category {
-  id                 Int          @id @default(autoincrement())
-  name               CategoryName @unique
-  description        String?
-  createdAt          DateTime     @default(now())
-  updatedAt          DateTime     @updatedAt
-  preferredByStudents User[]      @relation("PreferredCategory")
-  approvedStudents    User[]      @relation("ApprovedCategory")
-
-  @@map("categories")
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
 }
 
-model User {
-  id                  Int        @id @default(autoincrement())
-  fullName            String
-  email               String     @unique
-  passwordHash        String?
-  googleId            String?    @unique
-  role                Role       @default(STUDENT)
-  status              UserStatus @default(PENDING)
-  department          String
-  academicYear        String
-  preferredCategoryId Int
-  approvedCategoryId  Int?
-  createdAt           DateTime   @default(now())
-  updatedAt           DateTime   @updatedAt
-
-  preferredCategory Category  @relation("PreferredCategory", fields: [preferredCategoryId], references: [id])
-  approvedCategory  Category? @relation("ApprovedCategory", fields: [approvedCategoryId], references: [id])
-
-  @@map("users")
+enum TrainingStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
 }

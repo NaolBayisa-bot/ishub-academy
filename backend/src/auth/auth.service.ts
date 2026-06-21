@@ -29,7 +29,8 @@ export class AuthService {
 
     const user = await this.prisma.user.create({
       data: {
-        fullName: dto.fullName,
+        firstName: dto.firstName,
+        lastName: dto.lastName,
         email: dto.email,
         passwordHash,
         department: dto.department,
@@ -75,7 +76,8 @@ export class AuthService {
   private mapUser(prismaUser: any): IUser {
     return {
       id: prismaUser.id,
-      fullName: prismaUser.fullName,
+      firstName: prismaUser.firstName,
+      lastName: prismaUser.lastName,
       email: prismaUser.email,
       role: prismaUser.role as Role,
       status: prismaUser.status as UserStatus,

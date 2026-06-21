@@ -7,6 +7,10 @@ import LoginPage from './pages/LoginPage';
 import PendingApprovalPage from './pages/PendingApprovalPage';
 import StudentDashboard from './pages/dashboard/StudentDashboard';
 import AdminDashboard from './pages/dashboard/AdminDashboard';
+import CategoryAdminDashboard from './pages/dashboard/CategoryAdminDashboard';
+import TrainingFormPage from './pages/dashboard/TrainingFormPage';
+import StudentTrainingListPage from './pages/dashboard/StudentTrainingListPage';
+import StudentTrainingViewPage from './pages/dashboard/StudentTrainingViewPage';
 import UnauthorizedPage from './pages/dashboard/UnauthorizedPage';
 import NotFoundPage from './pages/NotFoundPage';
 import { Role } from '@ishub/shared';
@@ -45,6 +49,50 @@ export default function App() {
           element={
             <ProtectedRoute allowedRoles={[Role.MAIN_ADMIN]}>
               <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Student Trainings */}
+        <Route
+          path="/trainings"
+          element={
+            <ProtectedRoute allowedRoles={[Role.STUDENT]} allowedStatuses={['ACTIVE']}>
+              <StudentTrainingListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trainings/:id"
+          element={
+            <ProtectedRoute allowedRoles={[Role.STUDENT]} allowedStatuses={['ACTIVE']}>
+              <StudentTrainingViewPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Category Admin */}
+        <Route
+          path="/admin/trainings"
+          element={
+            <ProtectedRoute allowedRoles={[Role.CATEGORY_ADMIN]}>
+              <CategoryAdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/trainings/new"
+          element={
+            <ProtectedRoute allowedRoles={[Role.CATEGORY_ADMIN]}>
+              <TrainingFormPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/trainings/:id"
+          element={
+            <ProtectedRoute allowedRoles={[Role.CATEGORY_ADMIN]}>
+              <TrainingFormPage />
             </ProtectedRoute>
           }
         />

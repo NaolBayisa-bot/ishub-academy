@@ -12,7 +12,8 @@ export default function RegisterForm() {
   const { register } = useAuth();
 
   const [form, setForm] = useState<IRegisterInput>({
-    fullName: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
     department: '',
@@ -42,7 +43,8 @@ export default function RegisterForm() {
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!form.fullName.trim()) newErrors.fullName = 'Full name is required';
+    if (!form.firstName.trim()) newErrors.firstName = 'First name is required';
+    if (!form.lastName.trim()) newErrors.lastName = 'Last name is required';
     if (!form.email.trim()) newErrors.email = 'Email is required';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) newErrors.email = 'Invalid email format';
     if (!form.password) newErrors.password = 'Password is required';
@@ -93,12 +95,20 @@ export default function RegisterForm() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input
-          label="Full Name"
+          label="First Name"
           type="text"
-          placeholder="John Doe"
-          value={form.fullName}
-          onChange={(e) => updateField('fullName', e.target.value)}
-          error={errors.fullName}
+          placeholder="John"
+          value={form.firstName}
+          onChange={(e) => updateField('firstName', e.target.value)}
+          error={errors.firstName}
+        />
+        <Input
+          label="Last Name"
+          type="text"
+          placeholder="Doe"
+          value={form.lastName}
+          onChange={(e) => updateField('lastName', e.target.value)}
+          error={errors.lastName}
         />
         <Input
           label="Email"

@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUserStatusDto } from './dto/update-user.dto';
-import { UserStatus } from '@prisma/client';
+import { UserStatus, Role } from '@ishub/shared';
 
 @Injectable()
 export class UsersService {
@@ -28,6 +28,23 @@ export class UsersService {
       data: {
         status: dto.status as UserStatus,
         approvedCategoryId: dto.approvedCategoryId ?? user.preferredCategoryId,
+      },
+      include: {
+        preferredCategory: true,
+        approvedCategory: true,
+      },
+    });
+  }
+
+  async updateRole(id: number, body: { role: Role; approvedCategoryId?: number }) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) throw new NotFoundException('User not found');
+
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        role: body.role,
+        approvedCategoryId: body.approvedCategoryId ?? user.approvedCategoryId,
       },
       include: {
         preferredCategory: true,

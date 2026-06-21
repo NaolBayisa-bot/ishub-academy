@@ -17,3 +17,15 @@ export enum CategoryName {
   NETWORKING = 'NETWORKING',
   CREATIVE_WORKS = 'CREATIVE_WORKS',
 }
+
+export enum Difficulty {
+  BEGINNER = 'BEGINNER',
+  INTERMEDIATE = 'INTERMEDIATE',
+  ADVANCED = 'ADVANCED',
+}
+
+export enum TrainingStatus {
+  DRAFT = 'DRAFT',
+  PUBLISHED = 'PUBLISHED',
+  ARCHIVED = 'ARCHIVED',
+}

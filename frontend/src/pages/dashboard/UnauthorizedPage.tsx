@@ -13,9 +13,7 @@ export default function UnauthorizedPage() {
           </svg>
         </div>
         <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Access Denied</h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 font-mono">$ Permission denied (publickey)</p>
-          You don&apos;t have permission to access this page.
-        </p>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 font-mono">You don&apos;t have permission to access this page.</p>
         <Link to="/">
           <Button variant="secondary">Go Home</Button>
         </Link>

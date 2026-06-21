@@ -99,7 +99,7 @@ export default function AdminDashboard() {
               <tbody>
                 {students.map((student) => (
                   <tr key={student.id} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                    <td className="py-3 px-2 font-medium dark:text-gray-200">{student.fullName}</td>
+                    <td className="py-3 px-2 font-medium dark:text-gray-200">{student.firstName} {student.lastName}</td>
                     <td className="py-3 px-2 text-gray-500 dark:text-gray-400">{student.email}</td>
                     <td className="py-3 px-2 text-gray-500 dark:text-gray-400">{student.department}</td>
                     <td className="py-3 px-2 text-gray-500 dark:text-gray-400">{student.academicYear}</td>

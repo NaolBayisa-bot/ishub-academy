@@ -10,9 +10,7 @@ export default function NotFoundPage() {
           <span className="text-lg font-mono font-bold text-slate-400 dark:text-slate-500">404</span>
         </div>
         <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Page Not Found</h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 font-mono">$ cat /dev/null</p>
-          The page you&apos;re looking for doesn&apos;t exist.
-        </p>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 font-mono">The page you're looking for doesn't exist.</p>
         <Link to="/">
           <Button variant="secondary">Go Home</Button>
         </Link>

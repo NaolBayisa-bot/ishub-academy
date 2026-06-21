@@ -3,6 +3,10 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import Button from '../ui/Button';
 
+function getInitial(name: string) {
+  return name?.charAt(0)?.toUpperCase() || '?';
+}
+
 export default function Navbar() {
   const { isAuthenticated, user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
@@ -46,18 +50,31 @@ export default function Navbar() {
 
             {isAuthenticated ? (
               <>
+                <div className="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 flex items-center justify-center text-sm font-semibold">
+                  {getInitial(user?.firstName || '')}
+                </div>
                 <span className="text-sm text-slate-500 dark:text-slate-400 hidden sm:block font-mono text-xs tracking-wide">
-                  {user?.fullName}
+                  {user?.firstName}
                 </span>
                 {user?.role === 'MAIN_ADMIN' && (
                   <Link to="/admin" className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium">
                     Admin Panel
                   </Link>
                 )}
-                {user?.role === 'STUDENT' && user?.status === 'ACTIVE' && (
-                  <Link to="/dashboard" className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium">
-                    Dashboard
+                {user?.role === 'CATEGORY_ADMIN' && (
+                  <Link to="/admin/trainings" className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium">
+                    Manage Trainings
                   </Link>
+                )}
+                {user?.role === 'STUDENT' && user?.status === 'ACTIVE' && (
+                  <>
+                    <Link to="/dashboard" className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium">
+                      Dashboard
+                    </Link>
+                    <Link to="/trainings" className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium">
+                      My Trainings
+                    </Link>
+                  </>
                 )}
                 <Button variant="ghost" size="sm" onClick={handleLogout}>
                   Logout
