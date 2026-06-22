@@ -32,6 +32,8 @@ export default function LoginForm() {
 
       if (storedUser.role === 'MAIN_ADMIN') {
         navigate('/admin');
+      } else if (storedUser.role === 'CATEGORY_ADMIN') {
+        navigate('/admin/trainings');
       } else if (storedUser.status === 'PENDING') {
         navigate('/pending-approval');
       } else if (storedUser.status === 'ACTIVE') {

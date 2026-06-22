@@ -13,6 +13,8 @@ type Training = {
   thumbnail: string | null;
   difficulty: string;
   status: string;
+  order: number;
+  unlockType: string;
   category: { id: number; name: string };
   createdBy: { id: number; firstName: string; lastName: string };
   modules: { id: number; title: string }[];

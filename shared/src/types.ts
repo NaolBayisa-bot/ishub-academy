@@ -1,4 +1,4 @@
-import { Role, UserStatus, CategoryName, Difficulty, TrainingStatus } from './enums';
+import { Role, UserStatus, CategoryName, Difficulty, TrainingStatus, UnlockType, ResourceType } from './enums';
 
 export interface IUser {
   id: number;
@@ -30,11 +30,48 @@ export interface ITraining {
   thumbnail: string | null;
   difficulty: Difficulty;
   status: TrainingStatus;
+  order: number;
+  unlockType: UnlockType;
   categoryId: number;
   createdById: number;
   createdAt: string;
   updatedAt: string;
   modules?: IModule[];
+}
+
+export interface IStudentTraining extends ITraining {
+  locked: boolean;
+  lockReason: string | null;
+}
+
+export interface ITrainingAccessGrant {
+  id: number;
+  trainingId: number;
+  userId: number;
+  grantedAt: string;
+  grantedById: number;
+  student: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+}
+
+export interface IResource {
+  id: number;
+  title: string;
+  type: ResourceType;
+  fileUrl: string | null;
+  linkUrl: string | null;
+  categoryId: number;
+  trainingId: number | null;
+  createdById: number;
+  createdAt: string;
+  updatedAt: string;
+  category?: { id: number; name: string };
+  training?: { id: number; title: string };
+  createdBy?: { id: number; firstName: string; lastName: string };
 }
 
 export interface IModule {

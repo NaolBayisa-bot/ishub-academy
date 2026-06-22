@@ -14,6 +14,7 @@ model Category {
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
   trainings           Training[]
+  resources           Resource[]
   approvedStudents    User[]       @relation("ApprovedCategory")
   preferredByStudents User[]       @relation("PreferredCategory")
 
@@ -37,10 +38,31 @@ model User {
   updatedAt           DateTime             @updatedAt
   lessonCompletions   LessonCompletion[]
   trainings           Training[]
+  resources           Resource[]
   approvedCategory    Category?            @relation("ApprovedCategory", fields: [approvedCategoryId], references: [id])
   preferredCategory   Category             @relation("PreferredCategory", fields: [preferredCategoryId], references: [id])
+  accessGrants        TrainingAccessGrant[] // Student: trainings granted to them
+  grantedAccessGrants TrainingAccessGrant[] @relation("AccessGranter") // Admin: trainings they granted
 
   @@map("users")
+}
+
+model Resource {
+  id          Int          @id @default(autoincrement())
+  title       String
+  type        ResourceType
+  fileUrl     String?
+  linkUrl     String?
+  categoryId  Int
+  trainingId  Int?
+  createdById Int
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  category    Category     @relation(fields: [categoryId], references: [id])
+  training    Training?    @relation(fields: [trainingId], references: [id])
+  createdBy   User         @relation(fields: [createdById], references: [id])
+
+  @@map("resources")
 }
 
 model LessonCompletion {
@@ -87,22 +109,40 @@ model Module {
 }
 
 model Training {
-  id                Int                @id @default(autoincrement())
+  id                Int                   @id @default(autoincrement())
   title             String
   description       String
   thumbnail         String?
-  difficulty        Difficulty         @default(BEGINNER)
-  status            TrainingStatus     @default(DRAFT)
+  difficulty        Difficulty            @default(BEGINNER)
+  status            TrainingStatus        @default(DRAFT)
+  order             Int                   @default(0)
+  unlockType        UnlockType            @default(OPEN)
   categoryId        Int
   createdById       Int
-  createdAt         DateTime           @default(now())
+  createdAt         DateTime              @default(now())
   updatedAt         DateTime
   lessonCompletions LessonCompletion[]
   modules           Module[]
-  category          Category           @relation(fields: [categoryId], references: [id])
-  createdBy         User               @relation(fields: [createdById], references: [id])
+  resources         Resource[]
+  category          Category              @relation(fields: [categoryId], references: [id])
+  createdBy         User                  @relation(fields: [createdById], references: [id])
+  accessGrants      TrainingAccessGrant[]
 
   @@map("trainings")
+}
+
+model TrainingAccessGrant {
+  id          Int      @id @default(autoincrement())
+  trainingId  Int
+  userId      Int
+  grantedAt   DateTime @default(now())
+  grantedById Int
+  training    Training @relation(fields: [trainingId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id])
+  grantedBy   User     @relation("AccessGranter", fields: [grantedById], references: [id])
+
+  @@unique([trainingId, userId])
+  @@map("training_access_grants")
 }
 
 enum Role {
@@ -135,4 +175,15 @@ enum TrainingStatus {
   DRAFT
   PUBLISHED
   ARCHIVED
+}
+
+enum UnlockType {
+  OPEN
+  SEQUENTIAL
+  MANUAL
+}
+
+enum ResourceType {
+  CATEGORY
+  TRAINING
 }

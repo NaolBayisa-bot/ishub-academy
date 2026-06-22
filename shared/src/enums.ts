@@ -29,3 +29,14 @@ export enum TrainingStatus {
   PUBLISHED = 'PUBLISHED',
   ARCHIVED = 'ARCHIVED',
 }
+
+export enum UnlockType {
+  OPEN = 'OPEN',
+  SEQUENTIAL = 'SEQUENTIAL',
+  MANUAL = 'MANUAL',
+}
+
+export enum ResourceType {
+  CATEGORY = 'CATEGORY',
+  TRAINING = 'TRAINING',
+}

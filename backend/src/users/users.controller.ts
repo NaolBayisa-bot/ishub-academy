@@ -6,6 +6,8 @@ import {
   Body,
   UseGuards,
   ParseIntPipe,
+  Query,
+  Request,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
@@ -23,6 +25,12 @@ export class UsersController {
   @Roles(Role.MAIN_ADMIN)
   async findAll() {
     return this.usersService.findAll();
+  }
+
+  @Get('search')
+  @Roles(Role.CATEGORY_ADMIN)
+  async searchStudents(@Request() req, @Query('email') email?: string, @Query('q') q?: string) {
+    return this.usersService.searchStudentsInCategory(req.user.userId, email || q || '');
   }
 
   @Patch(':id/status')

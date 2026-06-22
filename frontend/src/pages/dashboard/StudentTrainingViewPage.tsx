@@ -5,6 +5,16 @@ import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import Spinner from '../../components/ui/Spinner';
 
+type TrainingResource = {
+  id: number;
+  title: string;
+  type: string;
+  fileUrl: string | null;
+  linkUrl: string | null;
+  createdAt: string;
+  createdBy: { id: number; firstName: string; lastName: string };
+};
+
 type LessonType = {
   id: number;
   title: string;
@@ -37,10 +47,28 @@ export default function StudentTrainingViewPage() {
   const [completedLessonIds, setCompletedLessonIds] = useState<Set<number>>(new Set());
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [resources, setResources] = useState<TrainingResource[]>([]);
+  const [loadingResources, setLoadingResources] = useState(true);
 
   useEffect(() => {
-    if (id) fetchTraining();
+    if (id) {
+      fetchTraining();
+      fetchResources();
+    }
   }, [id]);
+
+  const fetchResources = async () => {
+    if (!id) return;
+    try {
+      setLoadingResources(true);
+      const { data } = await api.get(`/resources/training/${id}`);
+      setResources(data);
+    } catch (err: any) {
+      // Silently fail - resources are optional
+    } finally {
+      setLoadingResources(false);
+    }
+  };
 
   const fetchTraining = async () => {
     try {
@@ -51,7 +79,12 @@ export default function StudentTrainingViewPage() {
         setActiveLessonId(data.modules[0].lessons[0].id);
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load training');
+      const message = err.response?.data?.message || 'Failed to load training';
+      if (err.response?.status === 403) {
+        setError(`🔒 ${message}`);
+      } else {
+        setError(message);
+      }
     } finally {
       setLoading(false);
     }
@@ -161,6 +194,41 @@ export default function StudentTrainingViewPage() {
             </div>
           ) : (
             <p className="text-slate-500">Select a lesson to start learning.</p>
+          )}
+        </Card>
+
+        {/* Training Resources */}
+        <Card className="lg:col-span-3 p-6">
+          <h2 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Training Resources</h2>
+          {loadingResources ? (
+            <div className="flex justify-center py-4"><Spinner className="h-6 w-6" /></div>
+          ) : resources.length === 0 ? (
+            <p className="text-sm text-slate-500 dark:text-slate-400">No additional resources for this training.</p>
+          ) : (
+            <div className="grid gap-3 md:grid-cols-2">
+              {resources.map((resource) => (
+                <div key={resource.id} className="flex items-center justify-between p-3 border border-slate-200 dark:border-tech-border rounded-md">
+                  <div>
+                    <h4 className="text-sm font-medium text-slate-900 dark:text-white">{resource.title}</h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      {resource.fileUrl ? '📄 File' : '🔗 Link'} · Added by {resource.createdBy.firstName} {resource.createdBy.lastName}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    {resource.fileUrl && (
+                      <a href={resource.fileUrl} target="_blank" rel="noopener noreferrer">
+                        <Button size="sm" variant="secondary">Download</Button>
+                      </a>
+                    )}
+                    {resource.linkUrl && (
+                      <a href={resource.linkUrl} target="_blank" rel="noopener noreferrer">
+                        <Button size="sm" variant="secondary">Open</Button>
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </Card>
       </div>

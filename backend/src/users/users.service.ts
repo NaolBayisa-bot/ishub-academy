@@ -52,4 +52,27 @@ export class UsersService {
       },
     });
   }
+
+  async searchStudentsInCategory(adminUserId: number, query: string) {
+    const admin = await this.prisma.user.findUnique({ where: { id: adminUserId }, select: { approvedCategoryId: true } });
+    if (!admin?.approvedCategoryId) return [];
+
+    return this.prisma.user.findMany({
+      where: {
+        role: 'STUDENT' as any,
+        approvedCategoryId: admin.approvedCategoryId,
+        email: { contains: query, mode: 'insensitive' },
+        status: 'ACTIVE' as any,
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        role: true,
+      },
+      take: 10,
+      orderBy: { email: 'asc' },
+    });
+  }
 }

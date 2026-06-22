@@ -11,6 +11,8 @@ import CategoryAdminDashboard from './pages/dashboard/CategoryAdminDashboard';
 import TrainingFormPage from './pages/dashboard/TrainingFormPage';
 import StudentTrainingListPage from './pages/dashboard/StudentTrainingListPage';
 import StudentTrainingViewPage from './pages/dashboard/StudentTrainingViewPage';
+import AdminResourcesPage from './pages/dashboard/AdminResourcesPage';
+import StudentResourcesPage from './pages/dashboard/StudentResourcesPage';
 import UnauthorizedPage from './pages/dashboard/UnauthorizedPage';
 import NotFoundPage from './pages/NotFoundPage';
 import { Role } from '@ishub/shared';
@@ -93,6 +95,24 @@ export default function App() {
           element={
             <ProtectedRoute allowedRoles={[Role.CATEGORY_ADMIN]}>
               <TrainingFormPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/resources"
+          element={
+            <ProtectedRoute allowedRoles={[Role.CATEGORY_ADMIN]}>
+              <AdminResourcesPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Student Resources */}
+        <Route
+          path="/resources"
+          element={
+            <ProtectedRoute allowedRoles={[Role.STUDENT]} allowedStatuses={['ACTIVE']}>
+              <StudentResourcesPage />
             </ProtectedRoute>
           }
         />

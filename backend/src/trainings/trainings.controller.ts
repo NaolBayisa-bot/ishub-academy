@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, Request, ForbiddenException } from '@nestjs/common';
 import { TrainingsService } from './trainings.service';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -23,8 +23,14 @@ export class TrainingsController {
   }
 
   @Get(':id')
-  findOne(@Request() req, @Param('id') id: string) {
-    return this.trainingsService.findOne(parseInt(id, 10), req.user.userId, req.user.role);
+  async findOne(@Request() req, @Param('id') id: string) {
+    const training = await this.trainingsService.findOne(parseInt(id, 10), req.user.userId, req.user.role);
+    if (req.user.role === Role.STUDENT) {
+      const { locked, lockReason } = await this.trainingsService.getLockState(parseInt(id, 10), req.user.userId, training);
+      if (locked) throw new ForbiddenException(lockReason || 'Training is locked');
+      return { ...training, locked, lockReason };
+    }
+    return training;
   }
 
   @Post()
@@ -50,6 +56,36 @@ export class TrainingsController {
   @Roles(Role.CATEGORY_ADMIN)
   updateStatus(@Request() req, @Param('id') id: string, @Body() body: { status: string }) {
     return this.trainingsService.updateStatus(parseInt(id, 10), req.user.userId, body.status as any);
+  }
+
+  @Patch(':id/order')
+  @Roles(Role.CATEGORY_ADMIN)
+  updateOrder(@Request() req, @Param('id') id: string, @Body() body: { order: number }) {
+    return this.trainingsService.updateOrder(parseInt(id, 10), req.user.userId, body.order);
+  }
+
+  @Patch(':id/unlock-type')
+  @Roles(Role.CATEGORY_ADMIN)
+  updateUnlockType(@Request() req, @Param('id') id: string, @Body() body: { unlockType: string }) {
+    return this.trainingsService.updateUnlockType(parseInt(id, 10), req.user.userId, body.unlockType as any);
+  }
+
+  @Get(':id/access-grants')
+  @Roles(Role.CATEGORY_ADMIN)
+  getAccessGrants(@Request() req, @Param('id') id: string) {
+    return this.trainingsService.getAccessGrants(parseInt(id, 10), req.user.userId);
+  }
+
+  @Post(':id/access-grants')
+  @Roles(Role.CATEGORY_ADMIN)
+  grantAccess(@Request() req, @Param('id') id: string, @Body() body: { userId: number }) {
+    return this.trainingsService.grantAccess(parseInt(id, 10), req.user.userId, body.userId);
+  }
+
+  @Delete(':id/access-grants/:grantId')
+  @Roles(Role.CATEGORY_ADMIN)
+  revokeAccess(@Request() req, @Param('id') id: string, @Param('grantId') grantId: string) {
+    return this.trainingsService.revokeAccess(parseInt(id, 10), req.user.userId, parseInt(grantId, 10));
   }
 
   @Post(':trainingId/modules')

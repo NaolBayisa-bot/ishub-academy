@@ -8,6 +8,7 @@ import Select from '../../components/ui/Select';
 import Spinner from '../../components/ui/Spinner';
 import Card from '../../components/ui/Card';
 import ModuleLessonBuilder from '../../components/training/ModuleLessonBuilder';
+import TrainingAccessGrantsPanel from '../../components/training/TrainingAccessGrantsPanel';
 
 type Category = { id: number; name: string };
 type Training = {
@@ -17,6 +18,8 @@ type Training = {
   thumbnail: string | null;
   difficulty: string;
   status: string;
+  order: number;
+  unlockType: string;
   categoryId: number;
 };
 
@@ -38,6 +41,8 @@ export default function TrainingFormPage() {
     difficulty: 'BEGINNER',
     categoryId: '',
     status: 'DRAFT',
+    order: 0,
+    unlockType: 'OPEN',
   });
 
   useEffect(() => {
@@ -66,6 +71,8 @@ export default function TrainingFormPage() {
         difficulty: data.difficulty,
         categoryId: String(data.categoryId),
         status: data.status,
+        order: data.order ?? 0,
+        unlockType: data.unlockType || 'OPEN',
       });
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to load training');
@@ -89,6 +96,8 @@ export default function TrainingFormPage() {
       if (isEdit) {
         await api.patch(`/trainings/${id}`, payload);
         await api.patch(`/trainings/${id}/status`, { status: form.status });
+        await api.patch(`/trainings/${id}/order`, { order: form.order });
+        await api.patch(`/trainings/${id}/unlock-type`, { unlockType: form.unlockType });
       } else {
         await api.post('/trainings', payload);
       }
@@ -144,15 +153,28 @@ export default function TrainingFormPage() {
             required
           />
           {isEdit && (
-            <Select
-              label="Status"
-              value={form.status}
-              onChange={(e) => setForm({ ...form, status: e.target.value })}
-              options={[
-                { value: 'DRAFT', label: 'Draft' },
-                { value: 'PUBLISHED', label: 'Published' },
-              ]}
-            />
+            <>
+              <Select
+                label="Status"
+                value={form.status}
+                onChange={(e) => setForm({ ...form, status: e.target.value })}
+                options={[
+                  { value: 'DRAFT', label: 'Draft' },
+                  { value: 'PUBLISHED', label: 'Published' },
+                ]}
+              />
+              <Select
+                label="Unlock Type"
+                value={form.unlockType}
+                onChange={(e) => setForm({ ...form, unlockType: e.target.value })}
+                options={[
+                  { value: 'OPEN', label: 'Open (anyone can access)' },
+                  { value: 'SEQUENTIAL', label: 'Sequential (complete previous training)' },
+                  { value: 'MANUAL', label: 'Manual (admin grants access)' },
+                ]}
+              />
+              <Input label="Order (position in category)" type="number" value={String(form.order)} onChange={(e) => setForm({ ...form, order: parseInt(e.target.value, 10) || 0 })} />
+            </>
           )}
           <div className="flex gap-3 pt-2">
             <Button type="submit" isLoading={saving}>{isEdit ? 'Update Training' : 'Create Training'}</Button>
@@ -161,7 +183,12 @@ export default function TrainingFormPage() {
         </form>
       </Card>
 
-      {isEdit && <ModuleLessonBuilder />}
+      {isEdit && (
+        <>
+          <ModuleLessonBuilder />
+          {form.unlockType === 'MANUAL' && id && <TrainingAccessGrantsPanel trainingId={parseInt(id, 10)} />}
+        </>
+      )}
     </div>
   );
 }

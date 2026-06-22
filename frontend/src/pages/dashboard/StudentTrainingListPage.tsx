@@ -12,6 +12,9 @@ type Training = {
   thumbnail: string | null;
   difficulty: string;
   status: string;
+  unlockType: string;
+  locked: boolean;
+  lockReason: string | null;
   category: { id: number; name: string };
   createdBy: { id: number; firstName: string; lastName: string };
   modules: { id: number; title: string }[];
@@ -38,6 +41,12 @@ export default function StudentTrainingListPage() {
     }
   };
 
+  const LockIcon = () => (
+    <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+    </svg>
+  );
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Available Trainings</h1>
@@ -53,15 +62,27 @@ export default function StudentTrainingListPage() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {trainings.map((training) => (
-            <Card key={training.id} className="p-5 flex flex-col gap-3">
+            <Card key={training.id} className={`p-5 flex flex-col gap-3 ${training.locked ? 'opacity-75' : ''}`}>
               <div>
-                <h3 className="font-semibold text-slate-900 dark:text-white">{training.title}</h3>
+                <div className="flex items-center gap-2">
+                  {training.locked && <LockIcon />}
+                  <h3 className={`font-semibold ${training.locked ? 'text-slate-500 dark:text-slate-400' : 'text-slate-900 dark:text-white'}`}>
+                    {training.title}
+                  </h3>
+                </div>
                 <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{training.description}</p>
+                {training.locked && training.lockReason && (
+                  <p className="text-xs text-amber-600 dark:text-amber-400 mt-2 italic">{training.lockReason}</p>
+                )}
                 <p className="text-xs text-slate-400 mt-2">Category: {training.category.name} · Difficulty: {training.difficulty}</p>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-xs text-slate-500">{training.modules?.length || 0} modules</span>
-                <Link to={`/trainings/${training.id}`}><Button size="sm">View Training</Button></Link>
+                {training.locked ? (
+                  <span className="text-xs text-slate-400 px-3 py-1.5 border border-slate-200 dark:border-tech-border rounded-md">Locked</span>
+                ) : (
+                  <Link to={`/trainings/${training.id}`}><Button size="sm">View Training</Button></Link>
+                )}
               </div>
             </Card>
           ))}

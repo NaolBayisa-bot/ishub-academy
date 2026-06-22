@@ -62,9 +62,14 @@ export default function Navbar() {
                   </Link>
                 )}
                 {user?.role === 'CATEGORY_ADMIN' && (
-                  <Link to="/admin/trainings" className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium">
-                    Manage Trainings
-                  </Link>
+                  <>
+                    <Link to="/admin/trainings" className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium">
+                      Trainings
+                    </Link>
+                    <Link to="/admin/resources" className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium">
+                      Resources
+                    </Link>
+                  </>
                 )}
                 {user?.role === 'STUDENT' && user?.status === 'ACTIVE' && (
                   <>
@@ -73,6 +78,9 @@ export default function Navbar() {
                     </Link>
                     <Link to="/trainings" className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium">
                       My Trainings
+                    </Link>
+                    <Link to="/resources" className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium">
+                      Resources
                     </Link>
                   </>
                 )}
