@@ -6,11 +6,7 @@
     "start": "nest start",
     "start:dev": "ts-node --transpile-only -r tsconfig-paths/register src/main.ts",
     "start:dev:watch": "nodemon --watch src --ext ts --exec \"ts-node --transpile-only -r tsconfig-paths/register src/main.ts\"",
-    "start:prod": "node dist/main",
-    "prisma:push": "prisma db push",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:seed": "ts-node prisma/seed.ts",
-    "prisma:studio": "prisma studio"
+    "start:prod": "node dist/main"
   },
   "dependencies": {
     "@ishub/shared": "*",
@@ -20,7 +16,6 @@
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.3.0",
-    "@prisma/client": "^5.12.0",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
@@ -39,7 +34,6 @@
     "@types/node": "^20.12.0",
     "@types/passport-google-oauth20": "^2.0.16",
     "@types/passport-jwt": "^4.0.1",
-    "prisma": "^5.12.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.0"
   }
